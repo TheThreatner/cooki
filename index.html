@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="favicon.png" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💌 you have mail...</title>
+
+<!-- ============================================================
+  ✏️  EASY EDIT ZONE — everything you need to personalise is up top!
+  Search for any [EDIT] comment to find a spot to change.
+  ============================================================ -->
+
+<style>
+  /* ══════════════════════════════════════════════════
+     PALETTE & TOKENS — change these to retheme the whole site
+  ══════════════════════════════════════════════════ */
+  :root {
+    --pink:       #FF85A1;
+    --pink-light: #FFD6E0;
+    --pink-soft:  #FFF0F4;
+    --lavender:   #D8B4FE;
+    --lav-light:  #F3E8FF;
+    --mint:       #A8E6CF;
+    --peach:      #FFCBA4;
+    --yellow:     #FFF3B0;
+    --blue-soft:  #BFE3FF;
+    --cream:      #FFF8F0;
+    --text:       #4A2040;
+    --text-soft:  #8B5A72;
+    --white:      #FFFFFF;
+
+    --radius-card: 20px;
+    --radius-pill: 999px;
+    --shadow-card: 0 4px 24px rgba(255,133,161,0.15);
+    --shadow-note: 3px 4px 0 rgba(180,100,130,0.18);
+  }
+
+  /* ══════════════════════════════════════════════════
+     FONTS
+  ══════════════════════════════════════════════════ */
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Caveat:wght@400;600;700&family=Pacifico&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--pink-soft);
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='5' fill='%23FF85A1' opacity='.8'/%3E%3C/svg%3E") 12 12, auto;
+  }
+
+  h1, h2, h3 { font-family: 'Pacifico', cursive; }
+  .handwriting { font-family: 'Caveat', cursive; }
+
+  /* ══════════════════════════════════════════════════
+     SCROLLBAR (cute pink)
+  ══════════════════════════════════════════════════ */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--pink-light); }
+  ::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 999px; }
+
+  /* ══════════════════════════════════════════════════
+     SPARKLE / FLOATING STUFF
+  ══════════════════════════════════════════════════ */
+  .sparkle-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .sparkle-bg span {
+    position: absolute;
+    font-size: 1.2rem;
+    animation: floatUp linear infinite;
+    opacity: 0;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: .7; }
+    90%  { opacity: .5; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ══════════════════════════════════════════════════
+     ENVELOPE LANDING
+  ══════════════════════════════════════════════════ */
+  #envelope-screen {
+    position: fixed; inset: 0; z-index: 1000;
+    background: linear-gradient(135deg, #FFF0F4 0%, #F3E8FF 50%, #FFF0F4 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 24px;
+    transition: opacity .6s, transform .6s;
+  }
+  #envelope-screen.gone {
+    opacity: 0; pointer-events: none; transform: scale(1.05);
+  }
+
+  .mail-label {
+    font-family: 'Caveat', cursive;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    color: var(--pink);
+    text-align: center;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+
+  .envelope-wrap { position: relative; cursor: pointer; }
+  .envelope-wrap:hover .env-body { transform: translateY(-6px); }
+  .env-body {
+    transition: transform .25s;
+    filter: drop-shadow(0 8px 32px rgba(255,133,161,.3));
+  }
+  .env-click-hint {
+    font-family: 'Caveat', cursive; font-size: 1.1rem;
+    color: var(--text-soft); text-align: center;
+    animation: bounce 1.4s ease-in-out infinite;
+  }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+  /* ══════════════════════════════════════════════════
+     CONFETTI CANVAS
+  ══════════════════════════════════════════════════ */
+  #confetti-canvas {
+    position: fixed; inset: 0; pointer-events: none; z-index: 999;
+  }
+
+  /* ══════════════════════════════════════════════════
+     MASCOT
+  ══════════════════════════════════════════════════ */
+  #mascot {
+    position: fixed; bottom: 20px; right: 20px;
+    z-index: 900; cursor: pointer;
+    animation: mascotBob 3s ease-in-out infinite;
+    font-size: 3rem;
+    filter: drop-shadow(0 4px 8px rgba(255,133,161,.4));
+    user-select: none;
+  }
+  @keyframes mascotBob { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-10px) rotate(5deg)} }
+  #mascot-bubble {
+    position: fixed; bottom: 88px; right: 16px;
+    background: white; border: 2px solid var(--pink);
+    border-radius: 16px 16px 4px 16px;
+    padding: 10px 14px;
+    font-family: 'Caveat', cursive; font-size: 1rem;
+    color: var(--text); max-width: 200px;
+    z-index: 900;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+    box-shadow: var(--shadow-card);
+  }
+  #mascot-bubble.show { opacity: 1; pointer-events: auto; }
+
+  /* ══════════════════════════════════════════════════
+     MAIN CONTENT WRAPPER
+  ══════════════════════════════════════════════════ */
+  #main-content {
+    max-width: 780px; margin: 0 auto;
+    padding: 40px 20px 120px;
+    position: relative; z-index: 1;
+  }
+
+  /* ══════════════════════════════════════════════════
+     SECTION / CARD SHARED STYLES
+  ══════════════════════════════════════════════════ */
+  .card {
+    background: white;
+    border-radius: var(--radius-card);
+    padding: 32px 28px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-card);
+    border: 2px solid var(--pink-light);
+    position: relative;
+    overflow: visible;
+  }
+  .card-title {
+    font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+    margin-bottom: 18px;
+    color: var(--pink);
+  }
+
+  .section-divider {
+    text-align: center;
+    font-size: 1.5rem;
+    margin: 8px 0 24px;
+    letter-spacing: 6px;
+    opacity: .5;
+  }
+
+  /* ══════════════════════════════════════════════════
+     INTRO CARD
+  ══════════════════════════════════════════════════ */
+  .intro-card {
+    background: linear-gradient(135deg, #FFD6E0 0%, #F3E8FF 100%);
+    text-align: center;
+    padding-top: 48px; padding-bottom: 48px;
+    border-color: var(--lavender);
+  }
+  .intro-birthday-text {
+    font-family: 'Pacifico', cursive;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    color: var(--pink);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .intro-sub {
+    font-family: 'Caveat', cursive;
+    font-size: 1.4rem;
+    color: var(--text-soft);
+    margin-bottom: 20px;
+  }
+  .intro-para {
+    font-size: 1rem; color: var(--text-soft);
+    max-width: 500px; margin: 0 auto;
+    line-height: 1.7;
+  }
+  .big-emoji { font-size: 4rem; display: block; margin-bottom: 12px; }
+  .ribbon-tag {
+    display: inline-block;
+    background: var(--pink); color: white;
+    font-family: 'Caveat', cursive; font-size: 1.1rem;
+    padding: 4px 18px; border-radius: 999px;
+    margin: 6px 4px;
+    box-shadow: 0 2px 8px rgba(255,133,161,.3);
+  }
+
+  /* ══════════════════════════════════════════════════
+     TIMELINE
+  ══════════════════════════════════════════════════ */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 12px; top: 0; bottom: 0;
+    width: 3px; background: linear-gradient(to bottom, var(--pink), var(--lavender), var(--mint));
+    border-radius: 3px;
+  }
+  .timeline-item {
+    position: relative; margin-bottom: 24px;
+  }
+  .timeline-item::before {
+    content: attr(data-emoji);
+    position: absolute; left: -32px;
+    width: 28px; height: 28px;
+    background: white; border: 2px solid var(--pink);
+    border-radius: 50%; display: flex;
+    align-items: center; justify-content: center;
+    font-size: .9rem; line-height: 1;
+    top: 0;
+    /* centering the emoji */
+    display: grid; place-items: center;
+  }
+  .timeline-date {
+    font-family: 'Caveat', cursive; font-size: 1rem;
+    color: var(--pink); font-weight: 700;
+  }
+  .timeline-memory {
+    font-size: .97rem; color: var(--text); line-height: 1.6;
+    margin-top: 2px;
+  }
+
+  /* ══════════════════════════════════════════════════
+     PHOTO GRID
+  ══════════════════════════════════════════════════ */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .photo-slot {
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: var(--pink-light);
+    border: 3px solid white;
+    box-shadow: 4px 4px 0 var(--pink-light);
+    transition: transform .2s;
+    transform: rotate(var(--rot, 0deg));
+  }
+  .photo-slot:hover { transform: rotate(0deg) scale(1.05); z-index: 2; }
+  .photo-slot img {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block;
+  }
+  .photo-slot .photo-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 8px; color: var(--text-soft);
+    font-family: 'Caveat', cursive; font-size: 1rem;
+    text-align: center; padding: 12px;
+  }
+  .photo-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,.88);
+    font-family: 'Caveat', cursive; font-size: .95rem;
+    color: var(--text); padding: 4px 8px;
+    text-align: center;
+  }
+
+  /* ══════════════════════════════════════════════════
+     STICKY NOTES
+  ══════════════════════════════════════════════════ */
+  .sticky-grid {
+    display: flex; flex-wrap: wrap; gap: 16px;
+  }
+  .sticky {
+    font-family: 'Caveat', cursive;
+    font-size: 1.1rem; line-height: 1.5;
+    padding: 18px 16px 14px;
+    border-radius: 4px;
+    box-shadow: var(--shadow-note);
+    flex: 1 1 180px;
+    min-height: 130px;
+    position: relative;
+    transform: rotate(var(--rot, 0deg));
+    transition: transform .2s;
+  }
+  .sticky:hover { transform: rotate(0deg) scale(1.04); z-index: 2; }
+  .sticky::before {
+    content: '';
+    position: absolute; top: -6px; left: 50%;
+    transform: translateX(-50%);
+    width: 40px; height: 12px;
+    border-radius: 3px;
+    opacity: .7;
+  }
+  .sticky-y  { background: var(--yellow);  } .sticky-y::before  { background: #e8d060; }
+  .sticky-p  { background: var(--pink-light); } .sticky-p::before  { background: var(--pink); }
+  .sticky-m  { background: var(--mint);    } .sticky-m::before  { background: #7fcfad; }
+  .sticky-lv { background: var(--lav-light); } .sticky-lv::before { background: var(--lavender); }
+  .sticky-pk { background: var(--peach);   } .sticky-pk::before  { background: #f0a070; }
+
+  /* ══════════════════════════════════════════════════
+     AWARDS
+  ══════════════════════════════════════════════════ */
+  .awards-grid {
+    display: flex; flex-wrap: wrap; gap: 14px;
+  }
+  .award {
+    background: linear-gradient(135deg, var(--yellow) 0%, var(--peach) 100%);
+    border-radius: 14px;
+    padding: 14px 18px;
+    flex: 1 1 200px;
+    text-align: center;
+    border: 2px solid rgba(255,200,100,.4);
+    box-shadow: 3px 3px 0 rgba(200,150,80,.2);
+  }
+  .award-icon { font-size: 2rem; display: block; margin-bottom: 6px; }
+  .award-title { font-family: 'Caveat', cursive; font-size: 1.25rem; font-weight: 700; color: var(--text); }
+  .award-sub { font-size: .85rem; color: var(--text-soft); margin-top: 4px; }
+
+  /* ══════════════════════════════════════════════════
+     FAKE STATS
+  ══════════════════════════════════════════════════ */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
+  .stat-chip {
+    background: var(--lav-light);
+    border: 2px solid var(--lavender);
+    border-radius: 14px; padding: 16px 12px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.8rem; color: var(--pink);
+    display: block; line-height: 1;
+  }
+  .stat-label { font-size: .82rem; color: var(--text-soft); margin-top: 6px; }
+
+  /* ══════════════════════════════════════════════════
+     FAKE NOTIFICATIONS
+  ══════════════════════════════════════════════════ */
+  .notif {
+    display: flex; align-items: flex-start; gap: 12px;
+    background: white; border-left: 4px solid var(--pink);
+    border-radius: 10px; padding: 12px 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(255,133,161,.1);
+    font-size: .93rem;
+  }
+  .notif-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .notif-app { font-weight: 700; font-size: .8rem; color: var(--pink); display: block; margin-bottom: 2px; }
+  .notif-time { font-size: .75rem; color: #bbb; margin-left: auto; flex-shrink: 0; }
+
+  /* ══════════════════════════════════════════════════
+     MAP CARD
+  ══════════════════════════════════════════════════ */
+  .map-area {
+    background: var(--blue-soft);
+    border-radius: 14px; padding: 20px;
+    text-align: center; position: relative;
+  }
+  .map-svg { width: 100%; max-width: 500px; margin: 0 auto; display: block; }
+  .map-label { font-family: 'Caveat', cursive; font-size: 1.1rem; color: var(--text); margin-top: 8px; }
+
+  /* ══════════════════════════════════════════════════
+     CLICKABLE STICKERS
+  ══════════════════════════════════════════════════ */
+  .sticker-field {
+    display: flex; flex-wrap: wrap; gap: 14px;
+    justify-content: center;
+  }
+  .sticker {
+    font-size: 2.6rem; cursor: pointer;
+    display: inline-block;
+    transition: transform .15s;
+    position: relative;
+    user-select: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,.1));
+  }
+  .sticker:hover { transform: scale(1.3) rotate(8deg); }
+  .sticker.revealed { animation: stickerPop .3s ease; }
+  @keyframes stickerPop { 0%{transform:scale(1)} 50%{transform:scale(1.5) rotate(10deg)} 100%{transform:scale(1)} }
+  .sticker-msg {
+    display: none;
+    position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%);
+    background: white; border: 2px solid var(--pink);
+    border-radius: 12px; padding: 8px 12px;
+    font-family: 'Caveat', cursive; font-size: 1rem;
+    color: var(--text); white-space: nowrap;
+    box-shadow: var(--shadow-card);
+    z-index: 10;
+  }
+  .sticker.revealed .sticker-msg { display: block; }
+
+  /* ══════════════════════════════════════════════════
+     STUPID BUTTONS
+  ══════════════════════════════════════════════════ */
+  .btn {
+    display: inline-block;
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    font-size: 1rem; padding: 10px 24px;
+    border-radius: var(--radius-pill);
+    border: none; cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    text-decoration: none;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: scale(.97); }
+  .btn-pink { background: var(--pink); color: white; box-shadow: 0 4px 0 #e05a80; }
+  .btn-pink:hover { box-shadow: 0 6px 0 #e05a80; }
+  .btn-red  { background: #ff4d6d; color: white; box-shadow: 0 4px 0 #c23050; }
+  .btn-ghost { background: transparent; color: var(--pink); border: 2px solid var(--pink); }
+  .btn-lav  { background: var(--lavender); color: white; box-shadow: 0 4px 0 #a070e0; }
+  .btn-lav:hover { box-shadow: 0 6px 0 #a070e0; }
+
+  .stupid-buttons { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .stupid-result {
+    margin-top: 14px; font-family: 'Caveat', cursive; font-size: 1.2rem;
+    color: var(--text-soft); text-align: center; min-height: 28px;
+    transition: opacity .3s;
+  }
+
+  /* ══════════════════════════════════════════════════
+     MINI GAME  (guess the emoji)
+  ══════════════════════════════════════════════════ */
+  .game-area { text-align: center; }
+  .game-clue {
+    font-size: 3.5rem; margin: 12px 0;
+    letter-spacing: 6px;
+    min-height: 60px;
+  }
+  .game-options {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    margin: 14px 0;
+  }
+  .game-opt {
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 2px solid var(--pink-light);
+    background: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: .95rem; cursor: pointer;
+    transition: all .15s; color: var(--text);
+  }
+  .game-opt:hover { border-color: var(--pink); background: var(--pink-light); }
+  .game-opt.correct { background: var(--mint); border-color: #7fcfad; color: var(--text); }
+  .game-opt.wrong   { background: #ffe0e6; border-color: #ffaabb; color: var(--text-soft); }
+  .game-score {
+    font-family: 'Pacifico', cursive; font-size: 1.2rem;
+    color: var(--pink); margin-top: 8px;
+  }
+  .game-feedback {
+    font-family: 'Caveat', cursive; font-size: 1.3rem;
+    min-height: 32px; color: var(--text-soft); margin-top: 8px;
+  }
+
+  /* ══════════════════════════════════════════════════
+     BIRTHDAY LETTER
+  ══════════════════════════════════════════════════ */
+  .letter-card {
+    background: var(--cream);
+    border: 2px dashed var(--pink);
+    font-family: 'Caveat', cursive;
+    font-size: 1.25rem; line-height: 1.75;
+    color: var(--text);
+  }
+  .letter-card p { margin-bottom: 14px; }
+  .letter-sig { font-size: 1.5rem; color: var(--pink); font-weight: 700; margin-top: 8px; }
+
+  /* ══════════════════════════════════════════════════
+     HIDDEN EGG TRAIL
+  ══════════════════════════════════════════════════ */
+  .egg {
+    display: inline-block; cursor: pointer;
+    font-size: 1.2rem; opacity: .25;
+    transition: opacity .2s, transform .2s;
+    user-select: none;
+  }
+  .egg:hover { opacity: 1; transform: scale(1.4); }
+  .egg-found { opacity: 1; animation: eggPop .5s ease; }
+  @keyframes eggPop { 0%{transform:scale(1)} 40%{transform:scale(1.6) rotate(-10deg)} 100%{transform:scale(1)} }
+
+  /* ══════════════════════════════════════════════════
+     PROGRESS / EGG COUNTER
+  ══════════════════════════════════════════════════ */
+  #egg-counter {
+    position: fixed; top: 14px; right: 14px;
+    background: white; border: 2px solid var(--pink);
+    border-radius: 999px; padding: 6px 16px;
+    font-family: 'Caveat', cursive; font-size: 1rem;
+    color: var(--text); z-index: 800;
+    box-shadow: var(--shadow-card);
+    transition: transform .2s;
+  }
+  #egg-counter.bump { animation: bumpAnim .3s ease; }
+  @keyframes bumpAnim { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+
+  /* ══════════════════════════════════════════════════
+     TOASTS / NOTIFICATIONS
+  ══════════════════════════════════════════════════ */
+  #toast-area {
+    position: fixed; bottom: 80px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 950; display: flex;
+    flex-direction: column; align-items: center;
+    gap: 8px; pointer-events: none;
+  }
+  .toast {
+    background: white; border: 2px solid var(--pink);
+    border-radius: 12px; padding: 10px 20px;
+    font-family: 'Caveat', cursive; font-size: 1.1rem;
+    color: var(--text); box-shadow: var(--shadow-card);
+    animation: toastIn .3s ease, toastOut .4s ease 2.5s forwards;
+    white-space: nowrap;
+  }
+  @keyframes toastIn  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes toastOut { from{opacity:1} to{opacity:0;transform:translateY(-10px)} }
+
+  /* ══════════════════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════════════════ */
+  @media(max-width:520px){
+    .card { padding: 22px 16px; }
+    .photo-grid { grid-template-columns: repeat(2,1fr); }
+    .stat-chip { min-width: 120px; }
+  }
+
+  /* ══════════════════════════════════════════════════
+     TAPE / DECO ELEMENTS
+  ══════════════════════════════════════════════════ */
+  .tape {
+    position: absolute; top: -14px; left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 80px; height: 24px;
+    background: rgba(255,200,220,.55);
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .tape-left  { left: 18%; }
+  .tape-right { left: 70%; }
+  .tape-tilt-right { transform: rotate(4deg); }
+
+  /* section stripe decoration */
+  .stripe-top {
+    height: 6px;
+    background: repeating-linear-gradient(90deg,
+      var(--pink) 0 20px, var(--lavender) 20px 40px,
+      var(--mint) 40px 60px, var(--peach) 60px 80px);
+    border-radius: 3px; margin-bottom: 20px;
+  }
+
+  .wiggle { display: inline-block; animation: wiggle 2.5s ease-in-out infinite; }
+  @keyframes wiggle { 0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)} }
+</style>
+</head>
+<body>
+
+<!-- ░░░░ SPARKLE BACKGROUND ░░░░ -->
+<div class="sparkle-bg" id="sparkle-bg"></div>
+
+<!-- ░░░░ CONFETTI CANVAS ░░░░ -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ░░░░ EGG COUNTER ░░░░ -->
+<div id="egg-counter">🥚 0 / 4 eggs found</div>
+
+<!-- ░░░░ TOAST AREA ░░░░ -->
+<div id="toast-area"></div>
+
+<!-- ════════════════════════════════════════════════════
+  ENVELOPE SCREEN
+═══════════════════════════════════════════════════ -->
+<div id="envelope-screen">
+  <!-- floating decorations -->
+  <div style="position:absolute;top:60px;left:40px;font-size:2rem;animation:floatUp 6s 0s linear infinite;opacity:.5">🌸</div>
+  <div style="position:absolute;top:30%;right:60px;font-size:1.5rem;animation:floatUp 7s 2s linear infinite;opacity:.4">✨</div>
+  <div style="position:absolute;bottom:100px;left:80px;font-size:1.8rem;animation:floatUp 5s 1s linear infinite;opacity:.4">🎀</div>
+
+  <div class="mail-label">💌 you have mail...</div>
+
+  <div class="envelope-wrap" onclick="openEnvelope()" title="click to open!">
+    <svg class="env-body" width="300" height="210" viewBox="0 0 300 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- envelope body -->
+      <rect x="10" y="60" width="280" height="140" rx="14" fill="#FFF0F4" stroke="#FF85A1" stroke-width="3"/>
+      <!-- envelope flap (open look) -->
+      <path d="M10 60 L150 130 L290 60" stroke="#FF85A1" stroke-width="2.5" fill="none"/>
+      <!-- left tri -->
+      <path d="M10 60 L10 200 L130 130Z" fill="#FFD6E0" opacity=".5"/>
+      <!-- right tri -->
+      <path d="M290 60 L290 200 L170 130Z" fill="#FFD6E0" opacity=".5"/>
+      <!-- wax seal -->
+      <circle cx="150" cy="100" r="30" fill="#FF85A1"/>
+      <text x="150" y="108" text-anchor="middle" font-size="22" fill="white">🎀</text>
+      <!-- hearts -->
+      <text x="50" y="50" font-size="20">💗</text>
+      <text x="230" y="50" font-size="20">💗</text>
+      <!-- scallop top -->
+      <path d="M10 60 Q30 40 50 60 Q70 40 90 60 Q110 40 130 60 Q150 40 170 60 Q190 40 210 60 Q230 40 250 60 Q270 40 290 60" fill="none" stroke="#FF85A1" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <div class="env-click-hint">✨ click to open ✨</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+  MASCOT
+═══════════════════════════════════════════════════ -->
+<div id="mascot" onclick="mascotSpeak()">🐰</div>
+<div id="mascot-bubble" id="mascot-bubble"></div>
+
+<!-- ════════════════════════════════════════════════════
+  MAIN CONTENT  (hidden until envelope opened)
+═══════════════════════════════════════════════════ -->
+<div id="main-content" style="opacity:0;pointer-events:none;">
+
+  <!-- ✦ ─── INTRO ─────────────────────────────────── -->
+  <div class="card intro-card">
+    <div class="tape tape-left"></div>
+    <div class="tape tape-right tape-tilt-right"></div>
+    <span class="big-emoji">🎂</span>
+    <div class="intro-birthday-text">
+      <!-- [EDIT] change her name/nickname here ↓ -->
+      Happy Birthday,<br>PUFFY!! 🥳
+    </div>
+    <div class="intro-sub">
+      <!-- [EDIT] small tagline / inside nickname ↓ -->
+      aka the girl whose facial cheeks outclass the numeber of cookies she has
+    </div>
+    <p class="intro-para">
+      <!-- [EDIT] short intro message — keep it casual ↓ -->
+      okay so. i made you this entire webpage(with help of AI ofc).
+      yes, this is real. yes, you deserve it.
+      you're welcome 😭💗
+    </p>
+    <div style="margin-top:20px;">
+      <span class="ribbon-tag">🎀 established: 2025 </span>
+      <span class="ribbon-tag">🌸 certified besties</span>
+      <span class="ribbon-tag">✨ THE Sealed Sibling</span>
+    </div>
+  </div>
+
+  <div class="section-divider">🌸 ✨ 🎀 ✨ 🌸</div>
+
+  <!-- ✦ ─── STUPID BUTTONS ──────────────────────── -->
+  <div class="card">
+    <div class="tape"></div>
+    <div class="stripe-top"></div>
+    <h2 class="card-title">⚠️ warning zone</h2>
+    <p style="font-size:.95rem;color:var(--text-soft);margin-bottom:18px;">
+      (please interact with this website responsibly. i am not responsible for what happens. expect anything ngl)
+    </p>
+    <div class="stupid-buttons">
+      <button class="btn btn-red" onclick="dontClick()" id="dont-click-btn">🚫 DO NOT CLICK</button>
+      <button class="btn btn-pink" onclick="cookieClick()" id="cookie-btn">🍪 click for a cooki</button>
+      <button class="btn btn-lav" onclick="confettiBurst()" >✨ confetti me</button>
+    </div>
+    <div class="stupid-result" id="stupid-result"></div>
+  </div>
+
+  <div class="section-divider">💌 📸 💗</div>
+
+  <!-- ✦ ─── FRIENDSHIP TIMELINE ───────────────── -->
+  <div class="card">
+    <div class="tape tape-right"></div>
+    <h2 class="card-title">📅 our (highly accurate) history</h2>
+    <p style="font-size:.9rem;color:var(--text-soft);margin-bottom:22px;">
+      a completely unbiased and factual timeline of us 🎗️
+    </p>
+
+    <div class="timeline">
+      <!-- [EDIT] add, remove, or change timeline items ↓ -->
+      <!-- copy a .timeline-item block to add more -->
+
+      <div class="timeline-item" data-emoji="✨">
+        <div class="timeline-date">RANDOM NIGHT OF AUGUST 2025</div>
+        <div class="timeline-memory">
+          <!-- [EDIT] how you met ↓ -->
+ahh yess.. i was abusing in chat and bro got scared of me... now after a year things have been reversed 🗣️🗣️
+                  </div>
+      </div>
+
+      <div class="timeline-item" data-emoji="💀">
+        <div class="timeline-date">THE KARMA-KAND</div>
+        <div class="timeline-memory">
+          <!-- [EDIT] a stupid/funny memory ↓ -->
+        Ahh yes.. i still remember the day i ragebaited that asshole... truest peak
+        </div>
+      </div>
+
+      <div class="timeline-item" data-emoji="💍">
+        <div class="timeline-date">ELDEN RING YAPPING</div>
+        <div class="timeline-memory">
+          <!-- [EDIT] another memory ↓ -->
+          the day me explaining you the lore of the elden ring... alas
+        </div>
+      </div>
+
+      <div class="timeline-item" data-emoji="🥺">
+        <div class="timeline-date"> ME WAS WEAK... wanted someone to help me</div>
+        <div class="timeline-memory">
+          <!-- [EDIT] sweet memory ↓ -->
+the day i was needy ahh bastard and you helped me out... my therapist.... you helped me so much bruvv
+                  </div>
+      </div>
+
+      <div class="timeline-item" data-emoji="🎂">
+        <div class="timeline-date">TODAY 🥳</div>
+        <div class="timeline-memory">
+      BRO DECIDE TO READ THIS SHITTY YAPP LOL...(btw all beta antagnist drugs have -lol suffix)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider">📸 🖼️ 📸</div>
+
+  <!-- ✦ ─── PHOTO SCRAPBOOK ───────────────────── -->
+  <div class="card">
+    <div class="tape tape-left tape-tilt-right"></div>
+    <h2 class="card-title">📸 the archives (classified)</h2>
+    <p style="font-size:.9rem;color:var(--text-soft);margin-bottom:20px;">
+      official photo evidence that you are a professional dumbass
+    </p>
+
+    <div class="photo-grid">
+
+      <!-- ─────────────────────────────────────────────
+        HOW TO ADD PHOTOS:
+        Option A — hosted image:
+          replace the photo-placeholder div with:
+          <img src="YOUR_IMAGE_URL" alt="caption">
+          <div class="photo-caption">your caption</div>
+
+        Option B — local file (if you're hosting yourself):
+          <img src="photo1.jpg" alt="caption">
+          <div class="photo-caption">lmao look at us</div>
+
+        Option C — keep the placeholder and just edit the text
+      ──────────────────────────────────────────────── -->
+
+      <div class="photo-slot" style="--rot:-2deg">
+        <div class="photo-placeholder">
+          <video src="coki1.mp4" controls></video>
+        </div>
+        <div class="photo-caption">ahh yes making own edits(click to play) </div>
+      </div>
+
+      <div class="photo-slot" style="--rot:1.5deg">
+        <div class="photo-placeholder">
+          🖼️<br><img src="coki2.png" alt="">
+        </div>
+        <div class="photo-caption">stole from your dad's instagram</div>
+      </div>
+
+      <div class="photo-slot" style="--rot:-1deg">
+        <div class="photo-placeholder">🖼️<br> <img src="coki3.png" alt=""></div>
+        <div class="photo-caption">stole from your instagram</div>
+      </div>
+
+      <div class="photo-slot" style="--rot:2.5deg">
+        <div class="photo-placeholder">🖼️<br><img src="coki4.png" alt=""></div>
+        <div class="photo-caption"> nah bro you aint puffy enough here</div>
+      </div>
+
+      <div class="photo-slot" style="--rot:-1.5deg">
+        <div class="photo-placeholder">📱<br><img src="coki5.png" alt=""></div>
+        <div class="photo-caption">mazdoori</div>
+      </div>
+
+      <div class="photo-slot" style="--rot:1deg">
+        <div class="photo-placeholder">🖼️<br> <img src="coki6.png" alt=""></div>
+        <div class="photo-caption">why ts in gujrati bruv</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider">💛 📝 💛</div>
+
+  <!-- ✦ ─── STICKY NOTES ──────────────────────── -->
+  <div class="card">
+    <div class="tape"></div>
+    <h2 class="card-title">📝 things about you (official list)</h2>
+    <p style="font-size:.9rem;color:var(--text-soft);margin-bottom:20px;">
+      grok-gpt-claude-het-dio collab to review this data. data is 100% accurate.
+    </p>
+
+    <div class="sticky-grid">
+
+      <!-- [EDIT] change the sticky note content ↓ -->
+      <!-- sticky colors: sticky-y (yellow), sticky-p (pink), sticky-m (mint), sticky-lv (lavender), sticky-pk (peach) -->
+
+      <div class="sticky sticky-y" style="--rot:-2deg">
+        <!-- [EDIT] ↓ -->
+        chat will always remain playful...
+      </div>
+
+      <div class="sticky sticky-p" style="--rot:1.5deg">
+        <!-- [EDIT] ↓ -->
+        still haven't watched jojos.. het and dio are sad 😔😭
+      </div>
+
+      <div class="sticky sticky-m" style="--rot:-1deg">
+        <!-- [EDIT] ↓ -->
+        dont talk to her past 12am... she is exessively flirty that time 💀💀💀
+      </div>
+
+      <div class="sticky sticky-lv" style="--rot:2deg">
+        <!-- [EDIT] ↓ -->
+        professional dumbass but in the funniest way possible.(electroboom reference now go study bcz this might have already taken half hour of your life)
+      </div>
+
+      <div class="sticky sticky-pk" style="--rot:-1.5deg">
+        <!-- [EDIT] ↓ -->
+        made my 18th birthday most memorable day of my life in middle of prelims 💀💀🥰🥰 
+      </div>
+
+      <div class="sticky sticky-y" style="--rot:1deg">
+        <!-- [EDIT] ↓ -->
+        merko achi khasi vocabulary and dhamkia de rkhi ha its fine tho... me chla leta hu 😔
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider">🏆 ✨ 🏆</div>
+
+  <!-- ✦ ─── FAKE AWARDS ───────────────────────── -->
+  <div class="card">
+    <div class="tape tape-right tape-tilt-right"></div>
+    <h2 class="card-title">🏆 official awards</h2>
+    <p style="font-size:.9rem;color:var(--text-soft);margin-bottom:20px;">
+      the COUNCIL has decided to award you 3 titles (bcz council has low thinking capacity and couldn't think 4th one)
+    </p>
+
+    <div class="awards-grid">
+
+      <!-- [EDIT] change award titles and subtitles ↓ -->
+      <!-- copy/paste .award blocks to add more -->
+
+      <div class="award">
+        <span class="award-icon">😭</span>
+        <div class="award-title">Professional CRYBABY</div>
+        <div class="award-sub">is very sensetive and cries often but its fine since crying is not bad</div>
+      </div>
+
+      <div class="award">
+        <span class="award-icon">🎭</span>
+        <div class="award-title">Drame-baaz</div>
+        <!-- [EDIT] ↓ -->
+        <div class="award-sub">Makes small moments meaningful by creating drama (how adorable) </div>
+      </div>
+
+      <div class="award">
+        <span class="award-icon">📽️</span>
+        <div class="award-title">MOVIE MAKER</div>
+        <!-- [EDIT] ↓ -->
+        <div class="award-sub">khudke boht edits bnati ha...</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider">📊 💅 📊</div>
+
+  <!-- ✦ ─── FAKE STATS ────────────────────────── -->
+  <div class="card">
+    <div class="tape tape-left"></div>
+    <h2 class="card-title">📊 our friendship: by the numbers(bcz maths students need numbers)</h2>
+    <p style="font-size:.9rem;color:var(--text-soft);margin-bottom:20px;">
+      (these are all real. i did not make any of them up hopefully.)
+    </p>
+
+    <div class="stats-grid">
+      <!-- [EDIT] change numbers and labels ↓ -->
+
+      <div class="stat-chip">
+        <span class="stat-num">9999+</span>
+        <div class="stat-label">hours spent talking absolute nonsense</div>
+      </div>
+
+      <div class="stat-chip">
+        <span class="stat-num">∞</span>
+        <div class="stat-label">times said "ok gng"</div>
+      </div>
+
+      <div class="stat-chip">
+        <!-- [EDIT] ↓ -->
+        <span class="stat-num">666+</span>
+        <div class="stat-label">hours of therapy provided</div>
+      </div>
+
+      <div class="stat-chip">
+        <span class="stat-num">0</span>
+        <div class="stat-label">secrets kept from each other (we tell everything ....hopefully)</div>
+      </div>
+
+      <div class="stat-chip">
+        <!-- [EDIT] ↓ -->
+        <span class="stat-num">67</span>
+        <div class="stat-label"> times i explained elden ring lore and you listened </div>
+      </div>
+
+      <div class="stat-chip">
+        <span class="stat-num">1+</span>
+        <div class="stat-label">year of friendship somehow i cant believe lol</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- ✦ ─── FAKE NOTIFICATIONS ────────────────── -->
+  
+  <!-- ✦ ─── TINY MAP ──────────────────────────── -->
+  
+
+  <div class="section-divider">🌸 🎁 🌸</div>
+
+  <!-- ✦ ─── CLICKABLE STICKERS ────────────────── -->
+  <div class="card">
+    <div class="tape tape-left tape-tilt-right"></div>
+    <h2 class="card-title">✨ click the stickers!</h2>
+    <p style="font-size:.9rem;color:var(--text-soft);margin-bottom:20px;">
+      i made you a horoscope... lets see which fortune you get 🗣️🗣️
+    </p>
+
+    <div class="sticker-field" id="sticker-field">
+      <!-- [EDIT] change sticker emojis and messages ↓ -->
+      <!-- format: data-msg="your message" -->
+
+      <span class="sticker" data-msg=" apko aaj 5 hazar rupee milenge from papa " onclick="revealSticker(this)">🌸</span>
+      <span class="sticker" data-msg=" apka aaj ka exam ha usme aap pass " onclick="revealSticker(this)">🍀</span>
+      <span class="sticker" data-msg=" chand ko dekh kr doodh pioge to sone ki barish hogi " onclick="revealSticker(this)">🌙</span>
+      <span class="sticker" data-msg=" aaj professor apki ijjat nikalega jese apne is titli ke pankh nikale the " onclick="revealSticker(this)">🦋</span>
+      <span class="sticker" data-msg=" its a dummy one.. click another one " onclick="revealSticker(this)">⭐</span>
+      <span class="sticker" data-msg=" aaj apko dher sari strawberry thusne ko milegi " onclick="revealSticker(this)">🍓</span>
+      <span class="sticker" data-msg=" aaj apko gf mil jayegi... lesbian fantasies " onclick="revealSticker(this)">🌈</span>
+      <span class="sticker" data-msg=" aaj ki chijji papa dilaenge " onclick="revealSticker(this)">🫶</span>
+      <span class="sticker" data-msg=" apko 6-7 gifts milenge " onclick="revealSticker(this)">🎀</span>
+
+    </div>
+  </div>
+
+  
+
+  <div class="section-divider">🥚 🔍 🥚</div>
+
+  <!-- ✦ ─── EASTER EGGS HINT ───────────────────── -->
+  <div class="card" style="background:var(--lav-light);border-color:var(--lavender);">
+    <div class="tape tape-right"></div>
+    <h2 class="card-title" style="color:#a070e0">🥚 psst. there are secrets.</h2>
+    <p style="font-size:.95rem;color:var(--text-soft);line-height:1.7;">
+      i asked easter bunny 🐰 to hide little easter eggs around this page, some are obvious,
+      some are sneaky. the egg counter up top tracks how many you've found.
+      go look around — there are <strong>4</strong> total. 
+      <span class="egg" data-found="false" onclick="findEgg(this,'egg1')" title="👀">🌸</span>
+      good luck bestie.(there are some glitches idk... if you can't find em all its not your mistake i couldnt resolve it)
+    </p>
+    <p style="font-family:'Caveat',cursive;font-size:1rem;color:var(--lavender);margin-top:10px;">
+      (hint: try clicking things that look unclickable)
+    </p>
+  </div>
+
+  <div class="section-divider">💌 💗 💌</div>
+
+  <!-- ✦ ─── BIRTHDAY LETTER ────────────────────── -->
+  <div class="card letter-card">
+    <div class="tape tape-left"></div>
+    <div class="tape tape-right tape-tilt-right"></div>
+    <h2 class="card-title" style="color:var(--pink);font-size:1.6rem;">💌 the actual letter</h2>
+
+    <p>
+      <!-- [EDIT] opening — keep it casual ↓ -->
+      alr alas... real shit... finally me yapping actual shit... bro its gonna be good 🗣️🗣️
+    </p>
+
+    <p>
+      <!-- [EDIT] main message — the real one ↓ -->
+      idk we somehow met and it was soooo fun spending time with you gng... it was sooo enjoyable to yk talk and interact with you.. it made me happy.. yk gng how its been b/w us i do not need to describe it word by 
+      word.. you know it gng....
+    </p>
+
+    <p>
+      <!-- [EDIT] specific thing you love about her ↓ -->
+      gng you always uplifted my mood broo... you trusted me sooo much and idk... i might have hurt you sometimes but yea... i'm genuinely sooo yk thankful... 
+    </p>
+
+    <p>
+      <!-- [EDIT] outro — go back to being funny ↓ -->
+      it took soo much non-medical vocab to yapp this yk... i am having tough time how to express myself... just trying to translate thoughts yk.... anyways
+    </p>
+
+    <p>
+      with all of the shityapping 🗣️🗣️🗣️
+    </p>
+
+    <div class="letter-sig">
+      <!-- [EDIT] your name or nickname ↓ -->
+      Het 
+    </div>
+
+    <p style="font-size:.85rem;color:#ccc;margin-top:16px;">
+      p.s. — meow🐈‍⬛🐈‍⬛<br>
+      p.p.s. — meow meow meow 🗣️🐈‍⬛🐈‍⬛🐈‍⬛`
+    </p>
+  </div>
+
+  <!-- ✦ ─── FINAL CONFETTI BTN ─────────────────── -->
+  <div style="text-align:center;margin:32px 0 16px;">
+    <button class="btn btn-pink" onclick="confettiBurst()" style="font-size:1.2rem;padding:16px 40px;">
+      🎉 one more confetti!! 🎉
+    </button>
+  </div>
+
+  <!-- footer -->
+  <div style="text-align:center;font-family:'Caveat',cursive;font-size:1rem;color:#ccc;padding-bottom:20px;">
+    made with help of claude 💀... it works tho...<br>
+    <!-- [EDIT] ↓ -->
+    © TheThreatner.Inc, 2026 — all rights reserved (jk share it with the girls)
+  </div>
+
+  <!-- hidden egg in the footer -->
+  <div style="text-align:center;margin-top:8px;">
+    <span class="egg" data-found="false" onclick="findEgg(this,'egg6')" title="👀">✨</span>
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- ═══════════════════════════════════════════════
+  JAVASCRIPT
+═══════════════════════════════════════════════ -->
+<script>
+// ══════════════════════════════════════════════════
+//  [EDIT] GAME QUESTIONS — customise these!
+//  Each question has: emoji clue, question, options array, correct answer index (0-based)
+// ══════════════════════════════════════════════════
+const GAME_QUESTIONS = [
+  {
+    emoji: "🌙 💬 ⏰",
+    q: "what time does she usually send the unhinged text?",
+    opts: ["9am like a normal person", "around 2-3am obviously", "never, she is very normal", "exactly at midnight on the dot"],
+    correct: 1,
+    win: "CORRECT!! you know her too well 😭",
+    lose: "bestie... really?? 💀"
+  },
+  {
+    // [EDIT] change this to a real inside-joke question ↓
+    emoji: "🎭 🤔 💭",
+    q: "[EDIT: an inside-joke question only she'd know the answer to]",
+    opts: [
+      "[EDIT: wrong answer]",
+      "[EDIT: correct answer]",
+      "[EDIT: funny wrong answer]",
+      "[EDIT: silly wrong answer]"
+    ],
+    correct: 1,
+    win: "YES exactly 😭😭",
+    lose: "WRONG!! how do you not remember this 💀"
+  },
+  {
+    emoji: "💗 🫶 ✨",
+    q: "how would you describe our friendship in one word?",
+    opts: ["chaotic", "chaotic", "chaotic", "chaotic (but make it cute)"],
+    correct: 3,
+    win: "the correct and only answer 🎀",
+    lose: "they're all chaotic bestie 😭 but specifically the cute kind"
+  },
+  {
+    // [EDIT] ↓
+    emoji: "🍕 🎬 🎵",
+    q: "[EDIT: a fun friendship trivia question — what's her favourite thing, etc.]",
+    opts: [
+      "[EDIT: option a]",
+      "[EDIT: option b — correct one]",
+      "[EDIT: option c]",
+      "[EDIT: option d]"
+    ],
+    correct: 1,
+    win: "[EDIT: funny correct message]",
+    lose: "[EDIT: funny wrong message]"
+  },
+];
+
+// ══════════════════════════════════════════════════
+//  MASCOT MESSAGES — she clicks the rabbit for these
+// ══════════════════════════════════════════════════
+const MASCOT_MSGS = [
+  "hi!! 🐰 happy birthday!!",
+  "pssst. there are easter eggs hidden 🥚",
+  "click the stickers!! they have secrets!!",
+  "i'm the easter bunny 🐰 i live here now",
+  "i hate santa btw",
+  "did you find all 4 eggs yet? 👀",
+  "you're clicking too much bruvvv",
+  "okay i have nothing else to say. bye!! 🐰",
+];
+
+// ═══════════════════════════════════════════════════════
+//  DO NOT EDIT BELOW THIS LINE (unless you're brave 💅)
+// ═══════════════════════════════════════════════════════
+
+// --- Sparkles ---
+const sparkleEmojis = ["✨","🌸","💗","🎀","⭐","💫","🌟","💕","🌷","🦋"];
+const sparkBg = document.getElementById("sparkle-bg");
+for(let i=0;i<22;i++){
+  const s = document.createElement("span");
+  s.textContent = sparkleEmojis[Math.floor(Math.random()*sparkleEmojis.length)];
+  s.style.left = Math.random()*100+"vw";
+  s.style.animationDuration = (8+Math.random()*12)+"s";
+  s.style.animationDelay = (Math.random()*10)+"s";
+  s.style.fontSize = (.7+Math.random()*.8)+"rem";
+  sparkBg.appendChild(s);
+}
+
+// --- Envelope open ---
+function openEnvelope(){
+  document.getElementById("envelope-screen").classList.add("gone");
+  const mc = document.getElementById("main-content");
+  mc.style.opacity = "1";
+  mc.style.pointerEvents = "auto";
+  confettiBurst();
+  toast("🎉 happy birthday!! 🎉");
+  setTimeout(()=>toast("💌 scroll down to explore!"),1400);
+}
+
+// --- Confetti ---
+const canvas = document.getElementById("confetti-canvas");
+const ctx = canvas.getContext("2d");
+let pieces = [];
+function confettiBurst(){
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  const colors=["#FF85A1","#FFD6E0","#D8B4FE","#A8E6CF","#FFF3B0","#FFCBA4","#FF85A1","#F472B6"];
+  for(let i=0;i<160;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height*-.5-20,
+      w:6+Math.random()*8, h:3+Math.random()*6,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      rot:Math.random()*360,
+      vx:(Math.random()-0.5)*4,
+      vy:2+Math.random()*4,
+      vr:(Math.random()-0.5)*6,
+      opacity:1
+    });
+  }
+  animateConfetti();
+}
+function animateConfetti(){
+  if(!pieces.length) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  pieces = pieces.filter(p=>p.opacity>0.01);
+  pieces.forEach(p=>{
+    ctx.save();
+    ctx.globalAlpha=p.opacity;
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle=p.color;
+    ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    ctx.restore();
+    p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+    if(p.y>canvas.height) p.opacity-=0.04;
+  });
+  if(pieces.length) requestAnimationFrame(animateConfetti);
+}
+
+// --- Toast ---
+function toast(msg){
+  const t=document.createElement("div");
+  t.className="toast"; t.textContent=msg;
+  const area=document.getElementById("toast-area");
+  area.appendChild(t);
+  setTimeout(()=>t.remove(),3200);
+}
+
+// --- Stupid buttons ---
+let dontClicked=0;
+function dontClick(){
+  dontClicked++;
+  const msgs=["why did you click it 😭","i literally said don't 💀","STOP","okay you know what. here's a sticker 🌸 happy now?","...😭","bestie i cannot with you","last warning 😭 (it's not)","fine. 🍪 here. are you happy. are you satisfied."];
+  document.getElementById("stupid-result").textContent = msgs[Math.min(dontClicked-1,msgs.length-1)];
+  if(dontClicked===1) toast("why 😭");
+  if(dontClicked>=4) findEgg(document.querySelector('#dont-click-btn'),'egg2');
+}
+function cookieClick(){
+  const msgs=["🍪 here you go bestie","🍪🍪 okay fine, two","🍪🍪🍪 you're welcome","okay the cookis are infinite. knock yourself out 🍪✨"];
+  const count = (window._cookieCount = (window._cookieCount||0)+1);
+  document.getElementById("stupid-result").textContent = msgs[Math.min(count-1,msgs.length-1)];
+  toast("🍪 cooki acquired");
+}
+
+// --- Stickers ---
+function revealSticker(el){
+  if(el.classList.contains("revealed")) { el.classList.remove("revealed"); return; }
+  document.querySelectorAll(".sticker.revealed").forEach(s=>s.classList.remove("revealed"));
+  el.classList.add("revealed");
+  const existing = el.querySelector(".sticker-msg");
+  if(!existing){
+    const d=document.createElement("div");
+    d.className="sticker-msg"; d.textContent=el.dataset.msg;
+    el.appendChild(d);
+  }
+}
+
+// --- Mascot ---
+let mascotIdx=0;
+function mascotSpeak(){
+  const b=document.getElementById("mascot-bubble");
+  b.textContent=MASCOT_MSGS[mascotIdx%MASCOT_MSGS.length];
+  b.classList.add("show");
+  mascotIdx++;
+  clearTimeout(window._mascotTimer);
+  window._mascotTimer=setTimeout(()=>b.classList.remove("show"),3500);
+}
+
+// --- Easter Eggs ---
+let eggsFound=new Set();
+function findEgg(el,id){
+  if(eggsFound.has(id)) return;
+  eggsFound.add(id);
+  el.classList.add("egg-found");
+  updateEggCounter();
+  const msgs={
+    egg1:"🥚 egg #1 found!! you're thorough 👀",
+    egg2:"🥚 egg #2: you really kept clicking 😭",
+    egg3:"🥚 egg #3!! sneaky~",
+    egg4:"🥚 egg #4: you found the mascot secret!",
+    egg5:"🥚 egg #5: almost there!!",
+    egg6:"🥚 egg #6: YOU FOUND THEM ALL!! 🎉🎉🎉",
+  };
+  toast(msgs[id]||"🥚 egg found!!");
+  if(eggsFound.size===6){
+    setTimeout(()=>{confettiBurst();toast("🏆 you found ALL the eggs!! bestie is a detective 🕵️");},400);
+  }
+}
+function updateEggCounter(){
+  const c=document.getElementById("egg-counter");
+  c.textContent=`🥚 ${eggsFound.size} / 6 eggs found`;
+  c.classList.add("bump");
+  setTimeout(()=>c.classList.remove("bump"),400);
+}
+
+// egg on mascot (4th click reveals)
+const origMascotSpeak=mascotSpeak;
+let mascotClicks=0;
+document.getElementById("mascot").onclick=function(){
+  mascotClicks++;
+  if(mascotClicks===4) findEgg(this,'egg4');
+  origMascotSpeak();
+};
+
+// egg hidden in the map
+document.querySelector(".map-area").addEventListener("dblclick",function(){
+  findEgg(this,'egg3');
+  toast("🥚 egg #3: you double-clicked the map?? 😭");
+});
+
+// egg hidden in stats (click the stat number 5 times)
+let statClicks=0;
+document.querySelectorAll(".stat-num").forEach(el=>{
+  el.style.cursor="pointer";
+  el.addEventListener("click",()=>{
+    statClicks++;
+    if(statClicks===5) findEgg(el,'egg5');
+  });
+});
+
+// --- Mini Game ---
+let gIdx=0, gScore=0, gPlaying=false, gAnswered=false;
+function startGame(){
+  gIdx=0; gScore=0; gPlaying=true;
+  document.getElementById("game-score").textContent="";
+  document.getElementById("game-btn").style.display="none";
+  showQuestion();
+}
+function showQuestion(){
+  if(gIdx>=GAME_QUESTIONS.length){
+    endGame(); return;
+  }
+  gAnswered=false;
+  const q=GAME_QUESTIONS[gIdx];
+  document.getElementById("game-clue").textContent=q.emoji;
+  document.getElementById("game-question").textContent=q.q;
+  document.getElementById("game-feedback").textContent="";
+  const opts=document.getElementById("game-options");
+  opts.innerHTML="";
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement("button");
+    b.className="game-opt"; b.textContent=o;
+    b.onclick=()=>answerQ(i,b);
+    opts.appendChild(b);
+  });
+}
+function answerQ(i,btn){
+  if(gAnswered) return;
+  gAnswered=true;
+  const q=GAME_QUESTIONS[gIdx];
+  const opts=document.querySelectorAll(".game-opt");
+  if(i===q.correct){
+    btn.classList.add("correct");
+    gScore++;
+    document.getElementById("game-feedback").textContent="✅ "+q.win;
+  } else {
+    btn.classList.add("wrong");
+    opts[q.correct].classList.add("correct");
+    document.getElementById("game-feedback").textContent="❌ "+q.lose;
+  }
+  gIdx++;
+  setTimeout(showQuestion,1600);
+}
+function endGame(){
+  gPlaying=false;
+  const total=GAME_QUESTIONS.length;
+  const msgs=[
+    "bestie… 💀 we need to talk",
+    "okay you tried 💗 that counts for something",
+    "not bad!! you're a decent bestie 🌸",
+    "you know her SO well 💗💗",
+    "PERFECT SCORE?? best friend of the year 🏆🎀"
+  ];
+  const rank=Math.round((gScore/total)*4);
+  document.getElementById("game-clue").textContent="🎉";
+  document.getElementById("game-question").textContent=`you got ${gScore}/${total}!`;
+  document.getElementById("game-options").innerHTML="";
+  document.getElementById("game-feedback").textContent=msgs[rank];
+  document.getElementById("game-score").textContent="";
+  const btn=document.getElementById("game-btn");
+  btn.textContent="🔄 play again";
+  btn.style.display="inline-block";
+  if(gScore===total) confettiBurst();
+}
+
+// window resize — resize confetti canvas
+window.addEventListener("resize",()=>{canvas.width=innerWidth;canvas.height=innerHeight;});
+</script>
+</body>
+</html>
